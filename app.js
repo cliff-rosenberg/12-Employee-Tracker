@@ -66,34 +66,77 @@ const mainMenu = [
     }
   ];//end main menu
 
+// View All Employees function
+const viewAllEmployees = () => {
+  console.log('View All Employees function...');
+  return;
+};
+
+// Add An Employee function
+const addEmployee = () => {
+  console.log('Add An Employee function...');
+  return;
+};
+
+// Update Employee Role function
+const updateEmployeeRole = () => {
+  console.log('Update Employee Role function...');
+  return;
+};
+
+// View All Roles function
+const viewAllRoles = () => {
+  console.log('View All Roles function...');
+  return;
+};
+
+// Add Roles function
+const addRole = () => {
+  console.log('Add Roles function...');
+  return;
+};
+
+// View All Departments function
+const viewAllDepartments = () => {
+  console.log('View All Departments function...');
+  return;
+};
+
+// Add A Department function
+const addDepartment = () => {
+  console.log('Add A Department function...');
+  return;
+};
+
 // main function for app
 const doApp = async () => {
     //let myInput;
     do {
       const response = await inquirer.prompt(mainMenu);
         if (response.choices === 'View All Employees') {
-          // TODO: View All Employees
+          viewAllEmployees();
           }
         if (response.choices === 'Add An Employee') {
-          // TODO: Add An Employee
+          addEmployee();
           }
         if (response.choices === 'Update Employee Role') {
-          // TODO: Update Employee Role
+          updateEmployeeRole();
           }
         if (response.choices === 'View All Roles') {
-          // TODO: View All Roles
+          viewAllRoles();
           }
         if (response.choices === 'Add Role') {
-          // TODO: Add Role
+          addRole();
           }
         if (response.choices === 'View All Departments') {
-          // TODO: View All Departments
+          viewAllDepartments();
           }
         if (response.choices === 'Add A Department') {
-          // TODO: Add A Department
+          addDepartment();
           }
         }
         while (myInput !="Quit");
+        console.log('Exiting app...');
   };// end of doApp()
 
 // ****
