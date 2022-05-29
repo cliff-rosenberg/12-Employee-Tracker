@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 // packages needed for this application
 const inquirer = require('inquirer');
-const mysql = require('mysql2')
+// using 'promise' based MySQL
+const mysql = require('mysql2/promise');
 const table = require('console.table');
 
 // load some cool ASCII art stuff
 const art = require('ascii-art');
 
 // boilerplate for MySQL database connection
-const db = mysql.createConnection(
+// now using 'promise' based syntax
+const db = await mysql.createConnection(
     {
       host: 'localhost',
       // MySQL username,
@@ -19,8 +21,6 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to employee_tracker_db database.`)
   );
-
-
 
 // Main Menu prompts array
 const mainMenu = [
@@ -42,10 +42,25 @@ const mainMenu = [
   ];//end main menu
 
 // View All Employees function
-const viewAllEmployees = () => {
-  console.log('View All Employees function...');
+const viewAllEmployees = async () => {
+  //console.log('View All Employees function...');
+  try {
+    const results = await db.query('SELECT * FROM employee');
+
+  console.log(`
+  
+  ----------Employee List----------
+  `)
+  console.table(results);
+  console.log(`
+  ---------End Employee List----------
+  `);
   return;
-};
+  }
+  catch (err) {
+    console.log(`ERROR - ${err}`);
+  }
+};// end viewAllEmployees
 
 // Add An Employee function
 const addEmployee = () => {
