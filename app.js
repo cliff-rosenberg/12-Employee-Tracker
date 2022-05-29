@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 // packages needed for this application
 const inquirer = require('inquirer');
-// using 'promise' based MySQL
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2/promise');// using 'promise' based MySQL
 const table = require('console.table');
 
 // load some cool ASCII art stuff
