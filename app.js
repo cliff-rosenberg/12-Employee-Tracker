@@ -47,7 +47,7 @@ const tryAscii = () => {
 
 tryAscii();
 
-// Main Menu prompts
+// Main Menu prompts array
 const mainMenu = [
     {
       name: "menuchoice",
