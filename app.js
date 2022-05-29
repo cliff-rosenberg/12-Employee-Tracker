@@ -20,32 +20,7 @@ const db = mysql.createConnection(
     console.log(`Connected to employee_tracker_db database.`)
   );
 
-// a function to do some ASCIII art :)
-const doAscii = async (msg) => {
-    try {
-        let rendered = await art.font(msg, 'doom').completed()
-        //rendered is the ascii
-        return rendered;
-        }
-        catch(err){
-        //err is an error
-        console.log(err);
-        }
-};
 
-// only works right now for words that are of similar length,
-// due to promise resolution timings
-const tryAscii = () => {
-    let message = 'Employee Tracker';
-    const strArray = message.split(' ');
-    for (let i = 0; i < strArray.length; i++) {
-    doAscii(strArray[i]).then(rendered => {
-        console.log(rendered);
-    });
-    };
-};
-
-tryAscii();
 
 // Main Menu prompts array
 const mainMenu = [
@@ -107,6 +82,33 @@ const addDepartment = () => {
   console.log('Add A Department function...');
   return;
 };
+
+// a function to do some ASCIII art :)
+const doAscii = async (msg) => {
+  try {
+      let rendered = await art.font(msg, 'doom').completed()
+      //rendered is the ascii
+      return rendered;
+      }
+      catch(err){
+      //err is an error
+      console.log(err);
+      }
+};
+
+// only works right now for words that are of similar length,
+// due to promise resolution timings
+const tryAscii = () => {
+  let message = 'Employee Tracker';
+  const strArray = message.split(' ');
+  for (let i = 0; i < strArray.length; i++) {
+  doAscii(strArray[i]).then(rendered => {
+      console.log(rendered);
+  });
+  };
+};
+
+tryAscii();
 
 // main function for app
 const doApp = async () => {
