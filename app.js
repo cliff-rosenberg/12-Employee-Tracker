@@ -60,17 +60,15 @@ const mainMenu = [
 
 // View All Employees function
 const viewAllEmployees = async () => {
-  //console.log('View All Employees function...');
   try {
     const results = await connection.query('SELECT id, first_name, last_name FROM employee');
   console.log(`
   
-  ----------Employee List----------
-  `)
+----------Employee List----------`)
   console.table(results[0]);
   console.log(`
-  ---------End Employee List----------
-  `);
+---------End Employee List----------`);
+  menuMain();
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -90,9 +88,20 @@ const updateEmployeeRole = () => {
 };
 
 // View All Roles function
-const viewAllRoles = () => {
-  console.log('View All Roles function...');
-  return;
+const viewAllRoles = async () => {
+  try {
+    const results = await connection.query('SELECT department.name AS Department, role.title AS Role, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id;');
+  console.log(`
+  
+----------View All Roles----------`)
+  console.table(results[0]);
+  console.log(`
+---------End Role List----------`);
+  menuMain();
+  }
+  catch (err) {
+    console.log(`ERROR - ${err}`);
+  }
 };
 
 // Add Roles function
@@ -115,43 +124,46 @@ const addDepartment = () => {
 
 // main function for app
 const menuMain = async () => {
-    let myInput;//has to be here due to scope issues with do/while  
-    do {
       const response = await inquirer.prompt(mainMenu);
       // main menu choices do functions
-      myInput = response.menuchoice;
-        if (myInput === 'View All Employees') {
+      //let myInput = response.menuchoice;
+      switch (response.menuchoice) {
+        case 'View All Employees': 
           viewAllEmployees();
-          }
-        if (myInput === 'Add An Employee') {
+          break;
+        case 'Add An Employee':
           addEmployee();
-          }
-        if (myInput === 'Update Employee Role') {
+          break;
+        case 'Update Employee Role':
           updateEmployeeRole();
-          }
-        if (myInput === 'View All Roles') {
+          break;
+        case 'View All Roles':
           viewAllRoles();
-          }
-        if (myInput === 'Add Role') {
+          break;
+        case 'Add Role':
           addRole();
-          }
-        if (myInput=== 'View All Departments') {
+          break;
+        case 'View All Departments':
           viewAllDepartments();
-          }
-        if (myInput === 'Add A Department') {
+          break;
+        case 'Add A Department':
           addDepartment();
-          }
+          break;
+        case 'Quit':
+          quitApp();
         }
-        while (myInput != "Quit");
-        console.log('Exiting app...');
-        process.exit();
-  };// end of doApp()
+  };// end of menuMain()
+
+const quitApp = () => {
+  console.log('Exiting app...');
+  process.exit();
+};
 
 const doApp = async () => {
   await connect();
   doAscii();//ASCII banner
   menuMain();
-};
+};//end doApp()
 
 // ****
 // Start the app here
