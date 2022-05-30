@@ -24,14 +24,14 @@ async function connect() {
 
 const doAscii = () => {
   console.log(figlet.textSync('Employee', {
-    font: 'Ogre',
+    font: 'Standard',
     horizontalLayout: 'default',
     verticalLayout: 'default',
     width: 80,
     whitespaceBreak: true
   }));
   console.log(figlet.textSync('Tracker', {
-    font: 'Ogre',
+    font: 'Standard',
     horizontalLayout: 'default',
     verticalLayout: 'default',
     width: 80,
@@ -64,10 +64,12 @@ const viewAllEmployees = async () => {
     const results = await connection.query('SELECT id, first_name, last_name FROM employee');
   console.log(`
   
-----------Employee List----------`)
+----------Employee List----------
+`)
   console.table(results[0]);
   console.log(`
----------End Employee List----------`);
+--------End Employee List---------
+`);
   menuMain();
   }
   catch (err) {
@@ -111,9 +113,22 @@ const addRole = () => {
 };
 
 // View All Departments function
-const viewAllDepartments = () => {
-  console.log('View All Departments function...');
-  return;
+const viewAllDepartments = async () => {
+  try {
+    const results = await connection.query('SELECT * FROM department');
+  console.log(`
+  
+----------Department List----------
+`)
+  console.table(results[0]);
+  console.log(`
+--------End Department List---------
+`);
+  menuMain();
+  }
+  catch (err) {
+    console.log(`ERROR - ${err}`);
+  }
 };
 
 // Add A Department function
