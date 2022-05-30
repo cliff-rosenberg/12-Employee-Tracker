@@ -5,21 +5,39 @@ const mysql = require('mysql2/promise');// using 'promise' based MySQL
 const table = require('console.table');
 
 // load some cool ASCII art stuff
-const art = require('ascii-art');
+const figlet = require('figlet');
+let connection;
 
 // boilerplate for MySQL database connection
 // now using 'promise' based syntax
-const db = await mysql.createConnection(
-    {
+async function connect() {
+  connection = await mysql.createConnection({
       host: 'localhost',
       // MySQL username,
       user: 'root',
       // MySQL password
       password: '',
       database: 'employee_tracker_db'
-    },
-    console.log(`Connected to employee_tracker_db database.`)
-  );
+      });
+    console.log('Connected to employee_tracker database...');
+  };
+
+const doAscii = () => {
+  console.log(figlet.textSync('Employee', {
+    font: 'Ogre',
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+    width: 80,
+    whitespaceBreak: true
+  }));
+  console.log(figlet.textSync('Tracker', {
+    font: 'Ogre',
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+    width: 80,
+    whitespaceBreak: true
+  }));
+};
 
 // Main Menu prompts array
 const mainMenu = [
@@ -44,17 +62,15 @@ const mainMenu = [
 const viewAllEmployees = async () => {
   //console.log('View All Employees function...');
   try {
-    const results = await db.query('SELECT * FROM employee');
-
+    const results = await connection.query('SELECT id, first_name, last_name FROM employee');
   console.log(`
   
   ----------Employee List----------
   `)
-  console.table(results);
+  console.table(results[0]);
   console.log(`
   ---------End Employee List----------
   `);
-  return;
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -97,63 +113,45 @@ const addDepartment = () => {
   return;
 };
 
-// a function to do some ASCIII art :)
-const doAscii = async (msg) => {
-  try {
-      let rendered = await art.font(msg, 'doom').completed()
-      //rendered is the ascii
-      return rendered;
-      }
-      catch(err){
-      //err is an error
-      console.log(err);
-      }
-};
-
-// only works right now for words that are of similar length,
-// due to promise resolution timings
-const tryAscii = () => {
-  let message = 'Employee Tracker';
-  const strArray = message.split(' ');
-  for (let i = 0; i < strArray.length; i++) {
-  doAscii(strArray[i]).then(rendered => {
-      console.log(rendered);
-  });
-  };
-};
-
-tryAscii();
-
 // main function for app
-const doApp = async () => {
-    //let myInput;
+const menuMain = async () => {
+    let myInput;//has to be here due to scope issues with do/while  
     do {
       const response = await inquirer.prompt(mainMenu);
-        if (response.choices === 'View All Employees') {
+      // main menu choices do functions
+      myInput = response.menuchoice;
+        if (myInput === 'View All Employees') {
           viewAllEmployees();
           }
-        if (response.choices === 'Add An Employee') {
+        if (myInput === 'Add An Employee') {
           addEmployee();
           }
-        if (response.choices === 'Update Employee Role') {
+        if (myInput === 'Update Employee Role') {
           updateEmployeeRole();
           }
-        if (response.choices === 'View All Roles') {
+        if (myInput === 'View All Roles') {
           viewAllRoles();
           }
-        if (response.choices === 'Add Role') {
+        if (myInput === 'Add Role') {
           addRole();
           }
-        if (response.choices === 'View All Departments') {
+        if (myInput=== 'View All Departments') {
           viewAllDepartments();
           }
-        if (response.choices === 'Add A Department') {
+        if (myInput === 'Add A Department') {
           addDepartment();
           }
         }
-        while (myInput !="Quit");
+        while (myInput != "Quit");
         console.log('Exiting app...');
+        process.exit();
   };// end of doApp()
+
+const doApp = async () => {
+  await connect();
+  doAscii();//ASCII banner
+  menuMain();
+};
 
 // ****
 // Start the app here
