@@ -14,7 +14,6 @@ let connection;
 // boilerplate for MySQL database connection
 // now using 'promise' based syntax
 async function connect() {
-  try {
     connection = await mysql.createConnection({
         host: 'localhost',
         // MySQL username,
@@ -24,9 +23,6 @@ async function connect() {
         database: 'employee_tracker_db'
         });
       console.log('Now connected to employee_tracker database...');
-  } catch (err) {
-    console.log(`ERROR - ${err}`);
-  }
 };//end MySQL connection setup
 
   // simple ASCII banner using Figlet
@@ -68,7 +64,7 @@ const viewAllDepartments = async () => {
 
 // View All Roles function
 const viewAllRoles = async () => {
-  // using table aliases to make query more readable
+  // using table aliases to make query more readable, see docs at
   // https://dev.mysql.com/doc/refman/8.0/en/select.html
   const query =`SELECT d.name AS "Department", r.title AS "Role", r.id AS "Role ID#", r.salary AS "Salary" 
   FROM role r 
@@ -92,7 +88,7 @@ const viewAllRoles = async () => {
 
 // View All Employees function
 const viewAllEmployees = async () => {
-  // using table aliases to make query more readable
+  // using table aliases to make query more readable, see docs at
   // https://dev.mysql.com/doc/refman/8.0/en/select.html
   const query =`SELECT em.id AS "Employee Id#", em.first_name AS "First Name", em.last_name AS "Last Name", r.title AS "Title", d.name AS "Department", r.salary AS "Salary", CONCAT(IFNULL(mgr.first_name, ''), ' ', IFNULL(mgr.last_name, 'N/A')) AS "Manager"
   FROM employee em
@@ -128,6 +124,7 @@ const addDepartment = () => {
 
 // Add Roles function
 const addRole = async () => {
+  //declared here to avoid scope issues
   let deptList;
   let deptExist;
   // get department roles
@@ -170,13 +167,79 @@ const addRole = async () => {
   } catch(err) {
     console.log(`ERROR - ${err}`);
   }
-  menuMain();
+  menuMain();//back to Main Menu
 };//end addRoles()
 
 // Add An Employee function
-const addEmployee = () => {
-  console.log('Add An Employee function...');
-  return;
+const addEmployee = async () => {
+  // declared here to avoid scope issues
+  let managers;
+  let mgrList;
+  let empRoles;
+  let roleChoices;
+  // get list of managers in databse
+  try {
+    managers = await connection.query('SELECT e.id, e.first_name, e.last_name FROM employee e WHERE role_id = 5');
+    // destructuring madness??
+    // NOTE: for Inquirer 'choices' to work, must be mapped to 'value:' and 'name:',
+    // the 'name:' field being displayed while the 'value:' field is what is returned
+    mgrList = managers[0].map(({ id, first_name, last_name }) => ({ value: id, name: `${first_name} ${last_name} `}));
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  }
+  // get roles for employees
+  try {
+    empRoles = await connection.query(`SELECT id, title FROM role WHERE title <> 'Manager'`);
+    // more destructuring
+    // NOTE: for Inquirer 'choices' to work, must be mapped to 'value:' and 'name:',
+    // the 'name:' field being displayed while the 'value:' field is what is returned
+    roleChoices = empRoles[0].map(({ id, title }) => ({
+      value: id, name: `${title}`
+    }));
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  }
+  
+  // get new employee information
+  const resp = await inquirer.prompt([
+    {
+      name: "first_name",
+      type: "input",
+      color: 'red',
+      message: "Enter First Name: "
+
+    },
+    {
+      name: "last_name",
+      type: "input",
+      message: "Enter Last Name: "
+    },
+    {
+      name: "role",
+      type: "list",
+      message: "What is their role?",
+      choices: roleChoices
+    },
+    {
+      name: "manager",
+      type: "list",
+      message: "Who is their manager?",
+      choices: mgrList
+    }
+  ]);
+  //console.table(resp);
+  // put new Employee data into database
+  try {
+    const result = await connection.query(`INSERT INTO employee SET ?`, {
+      first_name: resp.first_name,
+      last_name: resp.last_name,
+      role_id: resp.role,
+      manager_id: resp.manager
+    });
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  }
+  menuMain();//back to Main Menu
 };
 
 // Update Employee Role function
