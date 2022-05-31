@@ -14,16 +14,20 @@ let connection;
 // boilerplate for MySQL database connection
 // now using 'promise' based syntax
 async function connect() {
-  connection = await mysql.createConnection({
-      host: 'localhost',
-      // MySQL username,
-      user: 'root',
-      // MySQL password
-      password: '',
-      database: 'employee_tracker_db'
-      });
-    console.log('Now connected to employee_tracker database...');
-  };//end MySQL connection setup
+  try {
+    connection = await mysql.createConnection({
+        host: 'localhost',
+        // MySQL username,
+        user: 'root',
+        // MySQL password
+        password: '',
+        database: 'employee_tracker_db'
+        });
+      console.log('Now connected to employee_tracker database...');
+  } catch (err) {
+    console.log(`ERROR - ${err}`);
+  }
+};//end MySQL connection setup
 
   // simple ASCII banner using Figlet
 const doAscii = () => {
@@ -55,11 +59,11 @@ const viewAllDepartments = async () => {
   console.log(`
 --------End Department List---------
 `);
-  menuMain();//back to Main Menu
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
   }
+  menuMain();//back to Main Menu
 };//end viewAllDepartments()
 
 // View All Roles function
@@ -79,11 +83,11 @@ const viewAllRoles = async () => {
   console.log(`
 ---------End Role List----------
 `);
-  menuMain();//back to Main Menu
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
-  }
+  };
+  menuMain();//back to Main Menu
 };//end viewAllRoles()
 
 // View All Employees function
@@ -109,11 +113,11 @@ const viewAllEmployees = async () => {
   console.log(`
 --------End Employee List---------
 `);
-  menuMain();//back to Main Menu
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
-  }
+  };
+  menuMain();//back to Main Menu
 };// end viewAllEmployees
 
 // Add A Department function
@@ -124,34 +128,49 @@ const addDepartment = () => {
 
 // Add Roles function
 const addRole = async () => {
+  let deptList;
+  let deptExist;
   // get department roles
   try {
-    const existing = await connection.query('SELECT id, name FROM department');
-    let deptList = existing[0].map((dept) => {return dept.name});
-    //set up prompts for Inquirer
-    const roleQuestions=[
+    deptExist = await connection.query('SELECT id, name FROM department');
+    // destructuring madness??
+    deptList = deptExist[0].map(({ id, name }) => ({ value: id, name: `${id} ${name} `}));
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  }
+  //console.table(deptList);
+  //set up prompts for Inquirer
+  let resp = await inquirer.prompt(
+    [
       {
         name: "roleTitle",
         type: "input",
-        message: "Enter the role you'd like to add: "
+        message: "Enter the name of the new role: "
       },
       {
-        name: "selectedSalary",
+        name: "roleSalary",
         type: "input",
         message: "What is the salary of this role?"
       },
       {
-        name: "selectedDepo",
+        name: "selectedDept",
         type: "list",
         message: "Which department does this role belong to?",
-        choices: depolist
+        choices: deptList
       }
     ]
-
-    menuMain();
+  );
+  // update 'role' table with new data
+  try {
+    const result = await connection.query(`INSERT INTO role SET ?`, {
+      title: resp.roleTitle,
+      salary: resp.roleSalary,
+      department_id: resp.selectedDept
+    });
   } catch(err) {
     console.log(`ERROR - ${err}`);
   }
+  menuMain();
 };//end addRoles()
 
 // Add An Employee function
@@ -188,9 +207,9 @@ const mainMenu = [
 
 // main menu function for app
 const menuMain = async () => {
-      const response = await inquirer.prompt(mainMenu);
+      const resp = await inquirer.prompt(mainMenu);
       // main menu Inquirer choices to functions
-      switch (response.menuchoice) {
+      switch (resp.menuchoice) {
         case 'View All Employees': 
           viewAllEmployees();
           break;
