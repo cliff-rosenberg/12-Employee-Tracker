@@ -1,4 +1,4 @@
-# Note Taker Utility
+# Employee Tracker
 
 ## Table of Contents-
 - [Note Taker Utility](#note-taker-utility)
@@ -20,7 +20,7 @@ Link: [MIT License](https://opensource.org/licenses/MIT)
 
 ## Description
 
-  TODO
+  This is a "command line" style application that allows a business owner to manage the employees and their roles for a small company.
     
 ## Installation
 
