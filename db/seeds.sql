@@ -10,7 +10,7 @@ VALUES ("Accountant", 75000.00, 1),
   ("Engineer", 120000.00, 2),
   ("Generalist", 45000.00, 3),
   ("Software Developer", 100000.00, 4),
-  ("Manager", 65000.00, 5);
+  ("Manager", 165000.00, 5);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Robert", "Brill", 05, NULL),
   ("Angela", "Lincoln", 05, NULL),
