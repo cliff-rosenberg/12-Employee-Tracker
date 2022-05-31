@@ -6,6 +6,9 @@ const table = require('console.table');
 
 // load some cool ASCII art stuff
 const figlet = require('figlet');
+
+// instantiate MySQL connection object
+//  as global scope for use where needed
 let connection;
 
 // boilerplate for MySQL database connection
@@ -19,8 +22,8 @@ async function connect() {
       password: '',
       database: 'employee_tracker_db'
       });
-    console.log('Connected to employee_tracker database...');
-  };
+    console.log('Now connected to employee_tracker database...');
+  };//end MySQL connection setup
 
   // simple ASCII banner using Figlet
 const doAscii = () => {
@@ -40,26 +43,6 @@ const doAscii = () => {
   }));
 };//end doAscii()
 
-// Main Menu prompts array
-// ordered as given in README.md project docs
-const mainMenu = [
-    {
-      name: "menuchoice",
-      type: "list",
-      message: "What would you like to do?",
-      choices: [
-        "View All Departments",
-        "View All Employees",
-        "View All Roles",
-        "Add A Department",
-        "Add Role",
-        "Add An Employee",
-        "Update Employee Role",
-        "Quit",
-      ]
-    }
-  ];//end main menu
-
 // View All Departments function
 const viewAllDepartments = async () => {
   try {
@@ -72,7 +55,7 @@ const viewAllDepartments = async () => {
   console.log(`
 --------End Department List---------
 `);
-  menuMain();
+  menuMain();//back to Main Menu
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -96,7 +79,7 @@ const viewAllRoles = async () => {
   console.log(`
 ---------End Role List----------
 `);
-  menuMain();
+  menuMain();//back to Main Menu
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -126,7 +109,7 @@ const viewAllEmployees = async () => {
   console.log(`
 --------End Employee List---------
 `);
-  menuMain();
+  menuMain();//back to Main Menu
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -140,10 +123,36 @@ const addDepartment = () => {
 };
 
 // Add Roles function
-const addRole = () => {
-  console.log('Add Roles function...');
-  return;
-};
+const addRole = async () => {
+  // get department roles
+  try {
+    const existing = await connection.query('SELECT id, name FROM department');
+    let deptList = existing[0].map((dept) => {return dept.name});
+    //set up prompts for Inquirer
+    const roleQuestions=[
+      {
+        name: "roleTitle",
+        type: "input",
+        message: "Enter the role you'd like to add: "
+      },
+      {
+        name: "selectedSalary",
+        type: "input",
+        message: "What is the salary of this role?"
+      },
+      {
+        name: "selectedDepo",
+        type: "list",
+        message: "Which department does this role belong to?",
+        choices: depolist
+      }
+    ]
+
+    menuMain();
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  }
+};//end addRoles()
 
 // Add An Employee function
 const addEmployee = () => {
@@ -157,11 +166,30 @@ const updateEmployeeRole = () => {
   return;
 };
 
+// Main Menu prompts array
+// ordered as given in README.md project docs
+const mainMenu = [
+  {
+    name: "menuchoice",
+    type: "list",
+    message: "What would you like to do?",
+    choices: [
+      "View All Departments",
+      "View All Employees",
+      "View All Roles",
+      "Add A Department",
+      "Add Role",
+      "Add An Employee",
+      "Update Employee Role",
+      "Quit",
+    ]
+  }
+];//end main menu choices
+
 // main menu function for app
 const menuMain = async () => {
       const response = await inquirer.prompt(mainMenu);
-      // main menu choices do functions
-      //let myInput = response.menuchoice;
+      // main menu Inquirer choices to functions
       switch (response.menuchoice) {
         case 'View All Employees': 
           viewAllEmployees();
