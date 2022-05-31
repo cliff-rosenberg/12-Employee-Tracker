@@ -117,9 +117,62 @@ const viewAllEmployees = async () => {
 };// end viewAllEmployees
 
 // Add A Department function
-const addDepartment = () => {
-  console.log('Add A Department function...');
-  return;
+const addDepartment = async () => {
+  //declared here to avoid scope issues
+  let deptExist;
+  let deptArray = [];
+  // get department list
+  try {
+    deptExist = await connection.query('SELECT name FROM department');
+    // This puts the object values from database query into 2D array
+    // so Inquirer can 'validate:' the Department name being entered,
+    // making sure it does not already exist in the table!
+    deptExist[0].forEach((names) => {
+      deptArray.push(names.name);
+    });
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  };
+  console.log(`
+  ---- Existing Department Names ----
+  `);
+  deptArray.forEach((department) => {
+    console.log(department);
+  })
+  console.log(`
+  ------------ END -------------
+  `)
+  // prompt to enter new Department name
+  resp = await inquirer.prompt(
+    [
+      {
+        name: 'newDept',
+        type: 'input',
+        message: 'Enter the new Department name: ',
+        validate(value) {
+          const test = deptArray.includes(value);
+          if (test) {
+              return "This Department ID is alread used. Please select a different name."
+          } else {
+              return true;
+          }
+        }
+      },
+    ]
+  );//end Inquirer
+  try {
+    const result = await connection.query('INSERT INTO department SET ?',
+  {
+    name: resp.newDept,
+  }
+  );
+  console.log(`
+  ---- New Department Added ----
+  `)
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  };
+  menuMain();//back to Main Menu
 };
 
 // Add Roles function
@@ -127,10 +180,12 @@ const addRole = async () => {
   //declared here to avoid scope issues
   let deptList;
   let deptExist;
-  // get department roles
+  // get department list
   try {
     deptExist = await connection.query('SELECT id, name FROM department');
     // destructuring madness??
+    // NOTE: for Inquirer 'choices' to work, must be mapped to 'value:' and 'name:',
+    // the 'name:' field being displayed while the 'value:' field is what is returned
     deptList = deptExist[0].map(({ id, name }) => ({ value: id, name: `${id} ${name} `}));
   } catch(err) {
     console.log(`ERROR - ${err}`);
@@ -166,7 +221,10 @@ const addRole = async () => {
     });
   } catch(err) {
     console.log(`ERROR - ${err}`);
-  }
+  };
+  console.log(`
+  ------ END ------
+  `)
   menuMain();//back to Main Menu
 };//end addRoles()
 
@@ -205,25 +263,23 @@ const addEmployee = async () => {
     {
       name: "first_name",
       type: "input",
-      color: 'red',
-      message: "Enter First Name: "
-
+      message: "Enter employee first name: "
     },
     {
       name: "last_name",
       type: "input",
-      message: "Enter Last Name: "
+      message: "Enter employee last name: "
     },
     {
       name: "role",
       type: "list",
-      message: "What is their role?",
+      message: "Choose their role:",
       choices: roleChoices
     },
     {
       name: "manager",
       type: "list",
-      message: "Who is their manager?",
+      message: "Choose their manager:",
       choices: mgrList
     }
   ]);
@@ -248,73 +304,74 @@ const updateEmployeeRole = () => {
   return;
 };
 
-// Main Menu prompts array
-// ordered as given in README.md project docs
-const mainMenu = [
-  {
-    name: "menuchoice",
-    type: "list",
-    message: "What would you like to do?",
-    choices: [
-      "View All Departments",
-      "View All Employees",
-      "View All Roles",
-      "Add A Department",
-      "Add Role",
-      "Add An Employee",
-      "Update Employee Role",
-      "Quit",
-    ]
-  }
-];//end main menu choices
-
 // main menu function for app
 const menuMain = async () => {
-      const resp = await inquirer.prompt(mainMenu);
-      // main menu Inquirer choices to functions
-      switch (resp.menuchoice) {
-        case 'View All Employees': 
-          viewAllEmployees();
-          break;
-        case 'Add An Employee':
-          addEmployee();
-          break;
-        case 'Update Employee Role':
-          updateEmployeeRole();
-          break;
-        case 'View All Roles':
-          viewAllRoles();
-          break;
-        case 'Add Role':
-          addRole();
-          break;
-        case 'View All Departments':
-          viewAllDepartments();
-          break;
-        case 'Add A Department':
-          addDepartment();
-          break;
-        case 'Quit':
-          quitApp();
-        }
+  // Main Menu prompts array
+  // ordered as given in README.md project docs
+  const mainMenu = [
+    {
+      name: "menuchoice",
+      type: "list",
+      message: "What would you like to do?",
+      choices: [
+        "View All Departments",
+        "View All Employees",
+        "View All Roles",
+        "Add A Department",
+        "Add Role",
+        "Add An Employee",
+        "Update Employee Role",
+        "Quit",
+      ]
+    }
+  ];//end main menu choices
+  const resp = await inquirer.prompt(mainMenu);
+  // maps main menu Inquirer choices to functions
+  switch (resp.menuchoice) {
+    case 'View All Employees': 
+      viewAllEmployees();
+      break;
+    case 'Add An Employee':
+      addEmployee();
+      break;
+    case 'Update Employee Role':
+      updateEmployeeRole();
+      break;
+    case 'View All Roles':
+      viewAllRoles();
+      break;
+    case 'Add Role':
+      addRole();
+      break;
+    case 'View All Departments':
+      viewAllDepartments();
+      break;
+    case 'Add A Department':
+      addDepartment();
+      break;
+    case 'Quit':
+      quitApp();
+    }
 };//end of menuMain()
 
 // simple function to end app
 const quitApp = () => {
-  console.log('Exiting app...');
-  process.exit();
+  console.log(`
+  Exiting app...
+  `);
+  process.exit();//exits app here
 };//end quitApp()
 
 // sets MySQL connction,
 // displays ASCII banner,
 // then calls main menu function
-const doApp = async () => {
-  await connect();
+const initApp = async () => {
+  await connect();// MySQL database connection setup
   doAscii();//ASCII banner
-  menuMain();
+  menuMain();//call Main Menu function
 };//end doApp()
 
 // ****
 // Start the app here
 // ****
-doApp();
+initApp();
