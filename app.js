@@ -22,10 +22,10 @@ async function connect() {
         password: '',
         database: 'employee_tracker_db'
         });
-      console.log('Now connected to employee_tracker database...');
+      console.log('\x1b[7m', 'Connected to employee_tracker_db database...', '\x1b[0m');
 };//end MySQL connection setup
 
-  // simple ASCII banner using Figlet
+// simple ASCII banner using Figlet
 const doAscii = () => {
   console.log(figlet.textSync('Employee', {
     font: 'Standard',
@@ -41,26 +41,21 @@ const doAscii = () => {
     width: 80,
     whitespaceBreak: true
   }));
-};//end doAscii()
+};// ** end doAscii() **
 
 // View All Departments function
 const viewAllDepartments = async () => {
   try {
     const results = await connection.query('SELECT d.id AS "Dept. ID", d.name AS "Dept. Name" FROM department d');
-  console.log(`
-  
-----------Department List----------
-`)
+  console.log(`----------Department List----------`)
   console.table(results[0]);
-  console.log(`
---------End Department List---------
-`);
+  console.log(`--------End Department List---------`);
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
   }
   menuMain();//back to Main Menu
-};//end viewAllDepartments()
+};// ** end viewAllDepartments() **
 
 // View All Roles function
 const viewAllRoles = async () => {
@@ -69,22 +64,19 @@ const viewAllRoles = async () => {
   const query =`SELECT d.name AS "Department", r.title AS "Role", r.id AS "Role ID#", r.salary AS "Salary" 
   FROM role r 
   JOIN department d ON r.department_id = d.id;`
+  // lookup data from 'roles' table and join on role.department_id, deparment.id
   try {
     const results = await connection.query(query);
-  console.log(`
-  
-----------View All Roles---------
-`)
-  console.table(results[0]);
-  console.log(`
----------End Role List----------
-`);
+    // display all results in a table form
+    console.log('\n','-------- Viewing All Roles --------', '\n')
+    console.table(results[0]);
+    console.log('\n','---------- End Role List ----------', '\n');
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
   };
   menuMain();//back to Main Menu
-};//end viewAllRoles()
+};// ** end viewAllRoles() **
 
 // View All Employees function
 const viewAllEmployees = async () => {
@@ -99,29 +91,26 @@ const viewAllEmployees = async () => {
   LEFT JOIN employee mgr
 	ON mgr.id = em.manager_id;
   `;
+  // display the lookup results in a table here
   try {
     const results = await connection.query(query);
-  console.log(`
-  
-----------Employee List----------
-`)
-  console.table(results[0]);
-  console.log(`
---------End Employee List---------
-`);
+    // display the lookup results in a table here
+    console.log('\n','----------Employee List----------', '\n')
+    console.table(results[0]);
+    console.log('\n','--------End Employee List--------', '\n');
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
   };
   menuMain();//back to Main Menu
-};// end viewAllEmployees
+};// ** end viewAllEmployees() **
 
 // Add A Department function
 const addDepartment = async () => {
   //declared here to avoid scope issues
   let deptExist;
   let deptArray = [];
-  // get department list
+  // get department name list from 'department' table
   try {
     deptExist = await connection.query('SELECT name FROM department');
     // This puts the object values from database query into 2D array
@@ -129,7 +118,7 @@ const addDepartment = async () => {
     // making sure it does not already exist in the table!
     deptExist[0].forEach((names) => {
       deptArray.push(names.name);
-    });
+      });
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
@@ -160,27 +149,26 @@ const addDepartment = async () => {
       },
     ]
   );//end Inquirer
+  // Update 'department' table in database with new Department name
   try {
     const result = await connection.query('INSERT INTO department SET ?',
   {
     name: resp.newDept,
   }
   );
-  console.log(`
-  ---- New Department Added ----
-  `)
+  console.log('\n','---- New Department Added ----', '\n')
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
   menuMain();//back to Main Menu
-};
+};// ** end addDepartment() **
 
 // Add Roles function
 const addRole = async () => {
   //declared here to avoid scope issues
   let deptList;
   let deptExist;
-  // get department list
+  // Get department names list from 'department' table
   try {
     deptExist = await connection.query('SELECT id, name FROM department');
     // destructuring madness??
@@ -190,7 +178,6 @@ const addRole = async () => {
   } catch(err) {
     console.log(`ERROR - ${err}`);
   }
-  //console.table(deptList);
   //set up prompts for Inquirer
   let resp = await inquirer.prompt(
     [
@@ -211,8 +198,8 @@ const addRole = async () => {
         choices: deptList
       }
     ]
-  );
-  // update 'role' table with new data
+  );// end Inquirer loop
+  // Update 'role' table in database with new data
   try {
     const result = await connection.query(`INSERT INTO role SET ?`, {
       title: resp.roleTitle,
@@ -222,11 +209,9 @@ const addRole = async () => {
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
-  console.log(`
-  ------ END ------
-  `)
+  console.log('\n','------ New Role was added ------', '\n')
   menuMain();//back to Main Menu
-};//end addRoles()
+};// ** end addRole() **
 
 // Add An Employee function
 const addEmployee = async () => {
@@ -294,9 +279,9 @@ const addEmployee = async () => {
     });
   } catch(err) {
     console.log(`ERROR - ${err}`);
-  }
+  };
   menuMain();//back to Main Menu
-};
+};// ** end addEmployee() **
 
 // Update Employee Role function
 const updateEmployeeRole = async () => {
@@ -353,12 +338,13 @@ const updateEmployeeRole = async () => {
     resp.role,
     resp.employee
     ]);
+    console.log('\n', '\x1b[32m', '---- Employee Role was updated ----', '\x1b[0m', '\n');
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
-  // end database update
+  // **end database update
   menuMain();//back to Main Menu
-};//end updateEmployeeRole()
+};// ** end updateEmployeeRole() **
 
 // main menu function for app
 const menuMain = async () => {
@@ -377,10 +363,12 @@ const menuMain = async () => {
         "Add Role",
         "Add An Employee",
         "Update Employee Role",
+        new inquirer.Separator(),
         "Quit",
+        new inquirer.Separator(),
       ]
     }
-  ];//end main menu choices
+  ];// **end main menu choices
   const resp = await inquirer.prompt(mainMenu);
   // maps main menu Inquirer choices to functions
   switch (resp.menuchoice) {
@@ -408,15 +396,13 @@ const menuMain = async () => {
     case 'Quit':
       quitApp();
     }
-};//end of menuMain()
+};// ** end of menuMain() **
 
 // simple function to end app
 const quitApp = () => {
-  console.log(`
-  Exiting app...
-  `);
+  console.log('\n', 'Exiting app...', '\n');
   process.exit();//exits app here
-};//end quitApp()
+};// ** end quitApp() **
 
 // sets MySQL connction,
 // displays ASCII banner,
@@ -425,9 +411,9 @@ const initApp = async () => {
   await connect();// MySQL database connection setup
   doAscii();//ASCII banner
   menuMain();//call Main Menu function
-};//end doApp()
+};// ** end doApp() **
 
-// ****
-// Start the app here
-// ****
+// **********************
+// * Start the app here *
+// **********************
 initApp();
