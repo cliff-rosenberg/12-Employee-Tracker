@@ -299,10 +299,66 @@ const addEmployee = async () => {
 };
 
 // Update Employee Role function
-const updateEmployeeRole = () => {
-  console.log('Update Employee Role function...');
-  return;
-};
+const updateEmployeeRole = async () => {
+  let employees;
+  let empChoices;
+  let empRoles;
+  let roleChoices;
+  // get list of employees in databse
+  try {
+    employees = await connection.query('SELECT e.id, e.first_name, e.last_name, e.role_id, e.manager_id FROM employee e');
+    // destructuring results
+    // NOTE: for Inquirer 'choices' to work, must be mapped to 'value:' and 'name:',
+    // the 'name:' field being displayed while the 'value:' field is what is returned
+    empChoices = employees[0].map(({ id, first_name, last_name }) => ({ value: id, name: `${first_name} ${last_name} `}));
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  }
+  // get roles for employees
+  try {
+    empRoles = await connection.query(`SELECT id, title FROM role`);
+    // more destructuring
+    // NOTE: for Inquirer 'choices' to work, must be mapped to 'value:' and 'name:',
+    // the 'name:' field being displayed while the 'value:' field is what is returned
+    roleChoices = empRoles[0].map(({ id, title }) => ({
+      value: id, name: `${title}`
+    }));
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  };
+
+  // get new employee role info
+  const resp = await inquirer.prompt([
+    {
+      name: "employee",
+      type: "list",
+      message: "Choose employee name:",
+      choices: empChoices
+    },
+    {
+      name: "role",
+      type: "list",
+      message: "Choose their new role:",
+      choices: roleChoices
+    }
+    ]);//end inquirer
+  // console.table(resp);
+  // console.log(`
+  //   --------
+  //   `);
+    // update employee role
+  try {
+    const result = connection.query(`UPDATE employee SET role_id = ? WHERE id = ?`,
+    [
+    resp.role,
+    resp.employee
+    ]);
+  } catch(err) {
+    console.log(`ERROR - ${err}`);
+  };
+  // end database update
+  menuMain();//back to Main Menu
+};//end updateEmployeeRole()
 
 // main menu function for app
 const menuMain = async () => {
