@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
-// packages needed for this application
+// Packages needed for this application
 const inquirer = require('inquirer');
 const mysql = require('mysql2/promise');// using 'promise' based MySQL
 const table = require('console.table');
 
-// load some cool ASCII art stuff
+// Load some cool ASCII art stuff
 const figlet = require('figlet');
 
-// instantiate MySQL connection object
+// Instantiate MySQL connection object
 //  as global scope for use where needed
 let connection;
 
-// boilerplate for MySQL database connection
+// Boilerplate for MySQL database connection,
 // now using 'promise' based syntax
 async function connect() {
     connection = await mysql.createConnection({
@@ -22,8 +22,8 @@ async function connect() {
         password: '',
         database: 'employee_tracker_db'
         });
-      console.log('\x1b[7m', 'Connected to employee_tracker_db database...', '\x1b[0m');
-};//end MySQL connection setup
+      console.log('\n', '\x1b[7m', 'Connected to employee_tracker_db database...', '\x1b[0m', '\n');
+};//** end MySQL connection setup
 
 // simple ASCII banner using Figlet
 const doAscii = () => {
@@ -47,9 +47,9 @@ const doAscii = () => {
 const viewAllDepartments = async () => {
   try {
     const results = await connection.query('SELECT d.id AS "Dept. ID", d.name AS "Dept. Name" FROM department d');
-  console.log(`----------Department List----------`)
+  console.log('\n', '\x1b[36m', '---------- Department List ----------', '\x1b[0m', '\n');
   console.table(results[0]);
-  console.log(`--------End Department List---------`);
+  console.log('\n', '\x1b[32m', '-------- End Department List --------', '\x1b[0m', '\n');
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -68,9 +68,9 @@ const viewAllRoles = async () => {
   try {
     const results = await connection.query(query);
     // display all results in a table form
-    console.log('\n','-------- Viewing All Roles --------', '\n')
+    console.log('\n', '\x1b[36m', '-------- Viewing All Roles --------', '\x1b[0m', '\n')
     console.table(results[0]);
-    console.log('\n','---------- End Role List ----------', '\n');
+    console.log('\n', '\x1b[32m', '---------- End Role List ----------', '\x1b[0m', '\n');
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -95,9 +95,9 @@ const viewAllEmployees = async () => {
   try {
     const results = await connection.query(query);
     // display the lookup results in a table here
-    console.log('\n','----------Employee List----------', '\n')
+    console.log('\n', '\x1b[36m', '---------- Employee List ----------', '\x1b[0m', '\n')
     console.table(results[0]);
-    console.log('\n','--------End Employee List--------', '\n');
+    console.log('\n', '\x1b[32m', '-------- End Employee List --------', '\x1b[0m', '\n');
   }
   catch (err) {
     console.log(`ERROR - ${err}`);
@@ -115,22 +115,18 @@ const addDepartment = async () => {
     deptExist = await connection.query('SELECT name FROM department');
     // This puts the object values from database query into 2D array
     // so Inquirer can 'validate:' the Department name being entered,
-    // making sure it does not already exist in the table!
+    // making sure it does not already exist in the table
     deptExist[0].forEach((names) => {
       deptArray.push(names.name);
       });
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
-  console.log(`
-  ---- Existing Department Names ----
-  `);
+  console.log('\n', '\x1b[36m', '---- Existing Department Names ----', '\x1b[0m', '\n');
   deptArray.forEach((department) => {
     console.log(department);
   })
-  console.log(`
-  ------------ END -------------
-  `)
+  console.log('\n', '\x1b[33m', '--------------- END ---------------', '\x1b[0m', '\n')
   // prompt to enter new Department name
   resp = await inquirer.prompt(
     [
@@ -149,14 +145,14 @@ const addDepartment = async () => {
       },
     ]
   );//end Inquirer
-  // Update 'department' table in database with new Department name
+  // update 'department' table in database with new Department name
   try {
     const result = await connection.query('INSERT INTO department SET ?',
   {
     name: resp.newDept,
   }
   );
-  console.log('\n','---- New Department Added ----', '\n')
+  console.log('\n', '\x1b[32m', '---- New Department Added ----', '\x1b[0m', '\n');
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
@@ -209,7 +205,7 @@ const addRole = async () => {
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
-  console.log('\n','------ New Role was added ------', '\n')
+  console.log('\n', '\x1b[32m', '------ New Role was added ------', '\x1b[0m', '\n');
   menuMain();//back to Main Menu
 };// ** end addRole() **
 
@@ -267,8 +263,7 @@ const addEmployee = async () => {
       message: "Choose their manager:",
       choices: mgrList
     }
-  ]);
-  //console.table(resp);
+    ]);
   // put new Employee data into database
   try {
     const result = await connection.query(`INSERT INTO employee SET ?`, {
@@ -327,10 +322,7 @@ const updateEmployeeRole = async () => {
       choices: roleChoices
     }
     ]);//end inquirer
-  // console.table(resp);
-  // console.log(`
-  //   --------
-  //   `);
+
     // update employee role
   try {
     const result = connection.query(`UPDATE employee SET role_id = ? WHERE id = ?`,
@@ -342,11 +334,11 @@ const updateEmployeeRole = async () => {
   } catch(err) {
     console.log(`ERROR - ${err}`);
   };
-  // **end database update
+  // ** end database update
   menuMain();//back to Main Menu
 };// ** end updateEmployeeRole() **
 
-// main menu function for app
+// Main menu function for app
 const menuMain = async () => {
   // Main Menu prompts array
   // ordered as given in README.md project docs
