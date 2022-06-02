@@ -38,11 +38,14 @@ This app uses Node.js, the package.json file has all the dependancies inside. Co
 
 ## Screenshots
 
-TODO
+Main menu on startup:
+
+![screenshot1](./assets/screenshot1.png)
 
 ## Usage
 
-The app is launched by entering "node app.js" in the command window when inside the directory holding files.
+The app is launched by entering "node app.js" in the command window when inside the directory holding files.  
+**NOTE:** _Suggested to use at least a width of "100" in the terminal window for best text output formatting._
 
 ## Contributing
 
