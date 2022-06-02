@@ -38,8 +38,9 @@ This app uses Node.js, the package.json file has all the dependancies inside. Co
 
 ## Screenshots
 
-Main menu on startup:
+YouTube link to video walk-through of application: [https://youtu.be/jWxT9Y7GXXs](https://youtu.be/jWxT9Y7GXXs)
 
+Main menu on startup:
 ![screenshot1](./assets/screenshot1.png)
 
 ## Usage
