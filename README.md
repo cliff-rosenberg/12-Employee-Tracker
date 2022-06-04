@@ -8,6 +8,7 @@
   - [Installation](#installation)
   - [Screenshots](#screenshots)
   - [Usage](#usage)
+  - [Credits](#credits)
   - [Contributing](#contributing)
   - [Testing](#testing)
   - [Additional Info](#additional-info)
