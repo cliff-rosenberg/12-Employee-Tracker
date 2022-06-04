@@ -48,6 +48,12 @@ Main menu on startup:
 The app is launched by entering "node app.js" in the command window when inside the directory holding files.  
 **NOTE:** _Suggested to use at least a width of "100" in the terminal window for best text output formatting._
 
+## Credits
+
+* Thanks again to my class instructor [Farish Kashefinejad](https://www.linkedin.com/in/farishkash) for his continued efforts to detail for his students the "problem solving process" through his Structured Reviews of these homework assignments.
+
+* The open-source program [Beekeeper Studio](https://www.beekeeperstudio.io/) was very helpful in providing a toolset and environment where I could more rapidly develop the necessary SQL database queries I used in this application.
+
 ## Contributing
 
   [Contributor Covenant](https://www.contributor-covenant.org/)
