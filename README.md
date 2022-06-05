@@ -1,7 +1,7 @@
 # Employee Tracker
 
 ## Table of Contents-
-- [Employee Tracker App](#note-taker-utility)
+- [Employee Tracker App](#employee-tracker)
   - [Table of Contents-](#table-of-contents-)
   - [Licensing](#licensing)
   - [Description](#description)
